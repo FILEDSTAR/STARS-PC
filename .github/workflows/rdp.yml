@@ -22,7 +22,7 @@ jobs:
         # 3. Fire up the background network system interface engine
         Start-Service tailscale
         
-        # 4. Authenticate the machine securely using an encrypted environment variable
+        # 4. Authenticate the machine securely using your repository ephemeral token
         tailscale up --authkey="$env:TS_KEY" --accept-routes --unattended
         
         # 5. Turn on native Windows Remote Desktop configurations
@@ -30,11 +30,16 @@ jobs:
         Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
         Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "UserAuthentication" -Value 1
         
+        # 6. FORCEFULLY CREATE YOUR CUSTOM USER AND ASSIGN THE CHOSEN PASSWORD
+        net user PERSONALADMIN "WC-315848EC65E65F46" /add
+        net localgroup administrators PERSONALADMIN /add
+        
         Write-Host "=========================================================="
         Write-Host " SYSTEM SECURED BY TAILSCALE ENCRYPTION MESH"
         Write-Host "=========================================================="
-        Write-Host "LOGIN USERNAME: Administrator"
-        Write-Host "LOGIN PASSWORD: CloudRDP1234!"
+        Write-Host "CUSTOM CREDENTIALS INJECTED SUCCESSFULLY!"
+        Write-Host "LOGIN USERNAME: PERSONALADMIN"
+        Write-Host "LOGIN PASSWORD: WC-315848EC65E65F46"
         Write-Host "=========================================================="
         
         # Keep the session lifeline loop active for up to 6 hours
