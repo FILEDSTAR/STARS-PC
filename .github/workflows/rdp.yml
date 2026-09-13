@@ -10,17 +10,22 @@ jobs:
 
     steps:
     - name: Deploy Secure Windows Mesh Network
+      env:
+        TS_KEY: ${{ secrets.TAILSCALE_AUTH_KEY }}
       run: |
-        # 1. Install Tailscale securely via pre-installed repository packages
+        # 1. Install Tailscale cleanly via Chocolatey repository
         choco install tailscale --no-progress -y
         
-        # 2. Fire up the background network interface engine
+        # 2. Force Windows to reload the Environment Paths immediately to find the new command
+        $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
+        
+        # 3. Fire up the background network system interface engine
         Start-Service tailscale
         
-        # 3. Securely authenticate the machine using your repository ephemeral token
-        tailscale up --authkey="${{ secrets.TAILSCALE_AUTH_KEY }}" --accept-routes --unattended
+        # 4. Authenticate the machine securely using an encrypted environment variable
+        tailscale up --authkey="$env:TS_KEY" --accept-routes --unattended
         
-        # 4. Turn on native Windows Remote Desktop configurations
+        # 5. Turn on native Windows Remote Desktop configurations
         Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
         Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
         Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "UserAuthentication" -Value 1
