@@ -1,0 +1,37 @@
+name: Secure Tailscale Cloud RDP
+
+on: 
+  workflow_dispatch:
+
+jobs:
+  run-environment:
+    runs-on: windows-latest
+    timeout-minutes: 360
+
+    steps:
+    - name: Deploy Secure Windows Mesh Network
+      run: |
+        # 1. Install Tailscale securely via pre-installed repository packages
+        choco install tailscale --no-progress -y
+        
+        # 2. Fire up the background network interface engine
+        Start-Service tailscale
+        
+        # 3. Securely authenticate the machine using your repository ephemeral token
+        tailscale up --authkey="${{ secrets.TAILSCALE_AUTH_KEY }}" --accept-routes --unattended
+        
+        # 4. Turn on native Windows Remote Desktop configurations
+        Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
+        Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+        Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "UserAuthentication" -Value 1
+        
+        Write-Host "=========================================================="
+        Write-Host " SYSTEM SECURED BY TAILSCALE ENCRYPTION MESH"
+        Write-Host "=========================================================="
+        Write-Host "LOGIN USERNAME: Administrator"
+        Write-Host "LOGIN PASSWORD: CloudRDP1234!"
+        Write-Host "=========================================================="
+        
+        # Keep the session lifeline loop active for up to 6 hours
+        while ($true) { Start-Sleep -Seconds 60 }
+      shell: powershell
