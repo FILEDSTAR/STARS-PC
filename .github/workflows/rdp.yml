@@ -30,16 +30,14 @@ jobs:
         Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
         Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "UserAuthentication" -Value 1
         
-        # 6. FORCEFULLY CREATE YOUR CUSTOM USER AND ASSIGN THE CHOSEN PASSWORD
-        net user PERSONALADMIN "WC-315848EC65E65F46" /add
-        net localgroup administrators PERSONALADMIN /add
+        # 6. FORCEFULLY RESET THE RUNNERADMIN PASSWORD USING NATIVE SYSTEM COMMANDS
+        net user runneradmin "P@sswordCloudRDP2026!"
         
         Write-Host "=========================================================="
         Write-Host " SYSTEM SECURED BY TAILSCALE ENCRYPTION MESH"
         Write-Host "=========================================================="
-        Write-Host "CUSTOM CREDENTIALS INJECTED SUCCESSFULLY!"
-        Write-Host "LOGIN USERNAME: PERSONALADMIN"
-        Write-Host "LOGIN PASSWORD: WC-315848EC65E65F46"
+        Write-Host "LOGIN USERNAME: runneradmin"
+        Write-Host "LOGIN PASSWORD: P@sswordCloudRDP2026!"
         Write-Host "=========================================================="
         
         # Keep the session lifeline loop active for up to 6 hours
