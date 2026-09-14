@@ -1,4 +1,4 @@
-name: Secure Tailscale Cloud RDP
+name: ST3RLIGHTS RDP
 
 on: 
   workflow_dispatch:
