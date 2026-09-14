@@ -13,24 +13,18 @@ jobs:
       env:
         TS_KEY: ${{ secrets.TAILSCALE_AUTH_KEY }}
       run: |
-        # 1. Install Tailscale cleanly via Chocolatey repository
         choco install tailscale --no-progress -y
         
-        # 2. Force Windows to reload the Environment Paths immediately to find the new command
         $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
         
-        # 3. Fire up the background network system interface engine
         Start-Service tailscale
         
-        # 4. Authenticate the machine securely using your repository ephemeral token
         tailscale up --authkey="$env:TS_KEY" --accept-routes --unattended
         
-        # 5. Turn on native Windows Remote Desktop configurations
         Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
         Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
         Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp' -Name "UserAuthentication" -Value 1
         
-        # 6. FORCEFULLY RESET THE RUNNERADMIN PASSWORD USING NATIVE SYSTEM COMMANDS
         net user runneradmin "P@sswordCloudRDP2026!"
         
         Write-Host "=========================================================="
@@ -40,6 +34,5 @@ jobs:
         Write-Host "LOGIN PASSWORD: P@sswordCloudRDP2026!"
         Write-Host "=========================================================="
         
-        # Keep the session lifeline loop active for up to 6 hours
         while ($true) { Start-Sleep -Seconds 60 }
       shell: powershell
